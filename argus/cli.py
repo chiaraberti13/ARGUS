@@ -10,7 +10,6 @@ from .config import Config
 from .exporters import export
 from .modules import (
     dns_lookup,
-    domain as domain_mod,
     email_osint,
     ip_tracker,
     mac_lookup,
@@ -18,6 +17,9 @@ from .modules import (
     phone_tracker,
     username_tracker,
     web_recon,
+)
+from .modules import (
+    domain as domain_mod,
 )
 
 DISCLAIMER = (
@@ -106,14 +108,14 @@ def render_email(data: dict) -> None:
     if "error" in data:
         ui.error(data["error"])
         return
-    mx = data.get("domain_has_mx")
+    tri = {True: "yes", False: "no", None: "unknown"}
     rows = [
         ("Email", data.get("email")),
         ("Local part", data.get("local_part")),
         ("Domain", data.get("domain")),
         ("Valid syntax", "yes" if data.get("valid_syntax") else "no"),
-        ("Domain has MX", {True: "yes", False: "no", None: "unknown"}[mx]),
-        ("Gravatar exists", {True: "yes", False: "no", None: "unknown"}[data.get("gravatar_exists")]),
+        ("Domain has MX", tri[data.get("domain_has_mx")]),
+        ("Gravatar exists", tri[data.get("gravatar_exists")]),
         ("Gravatar URL", data.get("gravatar_url") if data.get("gravatar_exists") else None),
         ("MD5", data.get("md5")),
         ("SHA-256", data.get("sha256")),
@@ -458,7 +460,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         render_domain(data)
         _maybe_export(data, "domain", config, export_fmt)
     elif args.command == "dns":
-        types = [t.strip().upper() for t in args.types.split(",")] if getattr(args, "types", None) else None
+        raw_types = getattr(args, "types", None)
+        types = [t.strip().upper() for t in raw_types.split(",")] if raw_types else None
         data = dns_lookup.lookup(args.name, config, types=types)
         render_dns(data)
         _maybe_export(data, "dns", config, export_fmt)

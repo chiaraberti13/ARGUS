@@ -1,8 +1,7 @@
 """ASCII banner and program metadata."""
 from __future__ import annotations
 
-from . import __version__
-from . import ui
+from . import __version__, ui
 
 BANNER = r"""
      _    ____   ____ _   _ ____

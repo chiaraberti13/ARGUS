@@ -7,8 +7,8 @@ and which common security headers are present or missing.
 from __future__ import annotations
 
 import socket
-from urllib.parse import urlparse
 from typing import Optional
+from urllib.parse import urlparse
 
 from ..config import Config
 from ..utils import build_session
