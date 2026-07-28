@@ -1,0 +1,176 @@
+# 📖 Usage Guide / Guida all'uso
+
+🇬🇧 English below · 🇮🇹 Italiano più sotto ([vai](#-italiano))
+
+---
+
+## 🇬🇧 English
+
+### Two ways to use GhostTrack
+
+1. **Interactive menu** — just run `ghosttrack` with no arguments.
+2. **Command line** — run a subcommand for scripting/automation.
+
+### Global options
+These work either before or after the subcommand:
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--export {json,csv,html}` | Save a report of the result | off |
+| `--timeout SECONDS` | Per-request timeout | `8.0` |
+| `--workers N` | Concurrent workers (username scan) | `20` |
+| `--no-color` | Disable colored output | off |
+| `--version` | Print version and exit | — |
+
+### Commands
+
+#### `ip` — IP geolocation
+```bash
+ghosttrack ip 8.8.8.8
+ghosttrack ip 1.1.1.1 --export json
+```
+Returns country, region, city, coordinates, timezone, ISP/org, ASN and a
+ready-to-open Google Maps link. Uses HTTPS with automatic failover to a second
+provider. Private/reserved addresses are flagged.
+
+#### `phone` — phone number intelligence
+```bash
+ghosttrack phone "+14155552671"
+ghosttrack phone "02 1234 5678" --region IT      # help the parser with a region
+```
+Returns validity, line type (mobile/fixed/VoIP…), carrier, region, timezone(s)
+and E.164 / international / national / RFC3966 formats. **Works fully offline.**
+
+> Tip: always prefer international format (`+<country><number>`). Use `--region`
+> (ISO code like `US`, `IT`, `GB`) only when passing a national number.
+
+#### `username` — hunt a username across 50+ sites
+```bash
+ghosttrack username torvalds
+ghosttrack username johndoe --workers 30 --timeout 6 --export html
+```
+Checks 50+ platforms **concurrently** and lists where the username exists.
+Add sites by editing [`../data/sites.json`](../data/sites.json).
+
+> Note: some platforms return HTTP 200 for any URL, which can cause false
+> positives. For those, set `"method": "text"` with an `"absence"` string in
+> `sites.json` so a profile is only counted when that string is absent.
+
+#### `email` — passive email OSINT
+```bash
+ghosttrack email someone@example.com --export json
+```
+Validates syntax, checks whether the domain can receive mail (MX record),
+derives the Gravatar URL and reports whether a Gravatar exists. It performs
+**no** intrusive SMTP probing. Install `dnspython` for real MX checks.
+
+#### `myip` — your own public IP
+```bash
+ghosttrack myip
+```
+Discovers your public IP (with provider failover) and geolocates it.
+
+#### `config` — configuration
+```bash
+ghosttrack config --show      # print current settings
+ghosttrack config --init      # write ~/.config/ghosttrack/config.json
+```
+
+### Reports
+Reports are saved to `~/ghosttrack-reports/` by default (change with
+`GHOSTTRACK_OUTPUT_DIR`). The HTML report is a standalone dark-themed page with
+clickable links — great for sharing findings.
+
+### Automation example
+```bash
+for u in alice bob charlie; do
+  ghosttrack username "$u" --export json
+done
+```
+
+---
+
+## 🇮🇹 Italiano
+
+### Due modi per usare GhostTrack
+
+1. **Menu interattivo** — esegui `ghosttrack` senza argomenti.
+2. **Riga di comando** — esegui un sottocomando per scripting/automazione.
+
+### Opzioni globali
+Funzionano sia prima sia dopo il sottocomando:
+
+| Opzione | Descrizione | Default |
+|---------|-------------|---------|
+| `--export {json,csv,html}` | Salva un report del risultato | off |
+| `--timeout SECONDI` | Timeout per richiesta | `8.0` |
+| `--workers N` | Worker concorrenti (scansione username) | `20` |
+| `--no-color` | Disattiva l'output colorato | off |
+| `--version` | Mostra la versione ed esce | — |
+
+### Comandi
+
+#### `ip` — geolocalizzazione IP
+```bash
+ghosttrack ip 8.8.8.8
+ghosttrack ip 1.1.1.1 --export json
+```
+Restituisce nazione, regione, città, coordinate, fuso orario, ISP/organizzazione,
+ASN e un link a Google Maps pronto all'uso. Usa HTTPS con failover automatico su
+un secondo provider. Gli indirizzi privati/riservati vengono segnalati.
+
+#### `phone` — analisi numero di telefono
+```bash
+ghosttrack phone "+390212345678"
+ghosttrack phone "02 1234 5678" --region IT      # aiuta il parser con la regione
+```
+Restituisce validità, tipo di linea (mobile/fisso/VoIP…), operatore, regione,
+fusi orari e i formati E.164 / internazionale / nazionale / RFC3966.
+**Funziona completamente offline.**
+
+> Suggerimento: preferisci sempre il formato internazionale (`+<prefisso><numero>`).
+> Usa `--region` (codice ISO come `US`, `IT`, `GB`) solo con un numero nazionale.
+
+#### `username` — cerca uno username su 50+ siti
+```bash
+ghosttrack username torvalds
+ghosttrack username mariorossi --workers 30 --timeout 6 --export html
+```
+Controlla 50+ piattaforme **in parallelo** ed elenca dove lo username esiste.
+Aggiungi siti modificando [`../data/sites.json`](../data/sites.json).
+
+> Nota: alcune piattaforme rispondono HTTP 200 a qualsiasi URL, causando falsi
+> positivi. Per quelle, imposta `"method": "text"` con una stringa `"absence"`
+> in `sites.json`, così un profilo viene contato solo se quella stringa è assente.
+
+#### `email` — OSINT email passivo
+```bash
+ghosttrack email qualcuno@example.com --export json
+```
+Verifica la sintassi, controlla se il dominio può ricevere posta (record MX),
+ricava l'URL Gravatar e indica se un Gravatar esiste. **Non** esegue sondaggi
+SMTP intrusivi. Installa `dnspython` per controlli MX reali.
+
+#### `myip` — il tuo IP pubblico
+```bash
+ghosttrack myip
+```
+Rileva il tuo IP pubblico (con failover tra provider) e lo geolocalizza.
+
+#### `config` — configurazione
+```bash
+ghosttrack config --show      # mostra le impostazioni correnti
+ghosttrack config --init      # crea ~/.config/ghosttrack/config.json
+```
+
+### Report
+I report vengono salvati per default in `~/ghosttrack-reports/` (modificabile con
+`GHOSTTRACK_OUTPUT_DIR`). Il report HTML è una pagina autonoma con tema scuro e
+link cliccabili — perfetta per condividere i risultati.
+
+### Esempio di automazione
+```bash
+for u in alice bob charlie; do
+  ghosttrack username "$u" --export json
+done
+```
