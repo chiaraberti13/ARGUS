@@ -1,0 +1,72 @@
+"""User configuration handling.
+
+Configuration is loaded from (in order of precedence):
+  1. CLI flags
+  2. Environment variables (GHOSTTRACK_*)
+  3. A JSON config file (~/.config/ghosttrack/config.json)
+  4. Built-in defaults
+"""
+from __future__ import annotations
+
+import json
+import os
+from dataclasses import dataclass, asdict
+from pathlib import Path
+
+
+def config_dir() -> Path:
+    if os.name == "nt":
+        base = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+    else:
+        base = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+    return base / "ghosttrack"
+
+
+CONFIG_PATH = config_dir() / "config.json"
+
+
+@dataclass
+class Config:
+    timeout: float = 8.0
+    max_workers: int = 20
+    user_agent: str = (
+        "Mozilla/5.0 (compatible; GhostTrack/3.0; +https://github.com/HunxByts/GhostTrack)"
+    )
+    output_dir: str = str(Path.home() / "ghosttrack-reports")
+    verify_ssl: bool = True
+    retries: int = 2
+
+    @classmethod
+    def load(cls) -> "Config":
+        cfg = cls()
+        # 3. file
+        if CONFIG_PATH.exists():
+            try:
+                data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+                for k, v in data.items():
+                    if hasattr(cfg, k):
+                        setattr(cfg, k, v)
+            except (json.JSONDecodeError, OSError):
+                pass
+        # 2. environment overrides
+        env_map = {
+            "GHOSTTRACK_TIMEOUT": ("timeout", float),
+            "GHOSTTRACK_MAX_WORKERS": ("max_workers", int),
+            "GHOSTTRACK_USER_AGENT": ("user_agent", str),
+            "GHOSTTRACK_OUTPUT_DIR": ("output_dir", str),
+            "GHOSTTRACK_RETRIES": ("retries", int),
+        }
+        for env, (attr, cast) in env_map.items():
+            if env in os.environ:
+                try:
+                    setattr(cfg, attr, cast(os.environ[env]))
+                except ValueError:
+                    pass
+        if os.environ.get("GHOSTTRACK_NO_VERIFY_SSL"):
+            cfg.verify_ssl = False
+        return cfg
+
+    def save(self) -> Path:
+        CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        CONFIG_PATH.write_text(json.dumps(asdict(self), indent=2), encoding="utf-8")
+        return CONFIG_PATH
