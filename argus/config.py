@@ -22,6 +22,15 @@ def config_dir() -> Path:
     return base / "argus"
 
 
+def default_output_dir() -> Path:
+    """Default report location: a ``report`` folder inside the script's folder.
+
+    ``config.py`` lives in the ``argus`` package, so its parent's parent is the
+    project (script) root; reports are written to ``<script folder>/report``.
+    """
+    return Path(__file__).resolve().parent.parent / "report"
+
+
 CONFIG_PATH = config_dir() / "config.json"
 
 
@@ -33,7 +42,7 @@ class Config:
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
     )
-    output_dir: str = str(Path.home() / "argus-reports")
+    output_dir: str = str(default_output_dir())
     verify_ssl: bool = True
     retries: int = 2
 

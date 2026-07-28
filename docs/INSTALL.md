@@ -223,7 +223,7 @@ pip install -e . --upgrade
 
 ```bash
 # Remove the virtual environment and reports
-rm -rf .venv ~/argus-reports          # Windows: rmdir /s .venv
+rm -rf .venv report                   # Windows: rmdir /s .venv report
 
 # Remove the launcher
 rm ~/.local/bin/argus                 # Linux/macOS
