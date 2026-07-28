@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
-    GhostTrack automated installer for Windows (PowerShell).
+    Argus automated installer for Windows (PowerShell).
 
 .DESCRIPTION
     Idempotent installer that:
       1. Ensures Python 3.8+ is available (auto-installs via winget if missing).
       2. Creates an isolated virtual environment in .\.venv.
-      3. Installs GhostTrack and its dependencies into that venv.
-      4. Creates a `ghosttrack.cmd` launcher in a user bin folder and adds it to PATH.
+      3. Installs Argus and its dependencies into that venv.
+      4. Creates a `argus.cmd` launcher in a user bin folder and adds it to PATH.
 
 .PARAMETER WithDns
     Also install dnspython for real MX-record checks in the email module.
@@ -32,11 +32,11 @@ function Ok($m)    { Write-Host "[+] $m" -ForegroundColor Green }
 function Warn($m)  { Write-Host "[!] $m" -ForegroundColor Yellow }
 function Die($m)   { Write-Host "[x] $m" -ForegroundColor Red; exit 1 }
 
-Write-Host "GhostTrack installer (Windows)" -ForegroundColor White
+Write-Host "Argus installer (Windows)" -ForegroundColor White
 
 $RepoDir = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $VenvDir = Join-Path $RepoDir ".venv"
-$BinDir  = Join-Path $env:LOCALAPPDATA "Programs\GhostTrack\bin"
+$BinDir  = Join-Path $env:LOCALAPPDATA "Programs\Argus\bin"
 Info "Repository: $RepoDir"
 
 # --------------------------------------------------- ensure Python ----------
@@ -79,7 +79,7 @@ if (-not (Test-Path $VenvPy)) { Die "Virtual environment creation failed." }
 & $VenvPy -m pip install --upgrade pip | Out-Null
 
 # --------------------------------------------------- install package --------
-Info "Installing GhostTrack and dependencies …"
+Info "Installing Argus and dependencies …"
 & $VenvPy -m pip install -e $RepoDir
 if ($WithDns) { Info "Installing dnspython …"; & $VenvPy -m pip install "dnspython>=2.4.0" }
 if ($Dev)     { Info "Installing dev tools …"; & $VenvPy -m pip install "pytest>=7.0" "pytest-mock>=3.10" "ruff>=0.1.0" }
@@ -87,10 +87,10 @@ Ok "Package installed into virtualenv."
 
 # --------------------------------------------------- launcher ---------------
 New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
-$Launcher = Join-Path $BinDir "ghosttrack.cmd"
+$Launcher = Join-Path $BinDir "argus.cmd"
 @"
 @echo off
-"$VenvPy" -m ghosttrack %*
+"$VenvPy" -m argus %*
 "@ | Set-Content -Path $Launcher -Encoding ASCII
 Ok "Launcher installed: $Launcher"
 
@@ -105,6 +105,6 @@ if ($userPath -notlike "*$BinDir*") {
 
 Write-Host ""
 Ok "Installation complete!"
-Write-Host "  Run it with:          ghosttrack" -ForegroundColor Cyan
-Write-Host "  One-off command:      ghosttrack ip 8.8.8.8" -ForegroundColor Cyan
-Write-Host "  Without the launcher: `"$VenvPy`" -m ghosttrack" -ForegroundColor Cyan
+Write-Host "  Run it with:          argus" -ForegroundColor Cyan
+Write-Host "  One-off command:      argus ip 8.8.8.8" -ForegroundColor Cyan
+Write-Host "  Without the launcher: `"$VenvPy`" -m argus" -ForegroundColor Cyan

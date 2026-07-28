@@ -19,8 +19,8 @@ env/
 .coverage
 htmlcov/
 
-# GhostTrack output
-ghosttrack-reports/
+# Argus output
+argus-reports/
 
 # OS / editor
 .DS_Store

@@ -29,12 +29,12 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Lint
-        run: ruff check ghosttrack tests
+        run: ruff check argus tests
 
       - name: Run offline tests
         run: pytest -q
 
       - name: Smoke test CLI
         run: |
-          python -m ghosttrack --version
-          python -m ghosttrack phone "+14155552671"
+          python -m argus --version
+          python -m argus phone "+14155552671"

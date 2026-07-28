@@ -39,8 +39,8 @@ rimane pulito.
 sudo apt update && sudo apt install -y git
 
 # 2. Clona il progetto
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
 
 # 3. Avvia l'installer (usa sudo solo se Python/venv mancano)
 ./scripts/install.sh
@@ -54,12 +54,12 @@ Lo script eseguirà:
 1. Rilevamento di Ubuntu/Debian e verifica di Python 3.8+, `venv` e `pip`
    (installandoli con `apt` se mancanti).
 2. Creazione di un ambiente virtuale in `./.venv`.
-3. Installazione di GhostTrack e delle sue dipendenze.
-4. Creazione di un launcher `ghosttrack` in `~/.local/bin` e aggiunta al `PATH`.
+3. Installazione di Argus e delle sue dipendenze.
+4. Creazione di un launcher `argus` in `~/.local/bin` e aggiunta al `PATH`.
 
 Poi basta eseguire:
 ```bash
-ghosttrack
+argus
 ```
 Se il comando non viene trovato, ricarica la shell: `source ~/.bashrc` (o apri un nuovo terminale).
 
@@ -68,13 +68,13 @@ Se il comando non viene trovato, ricarica la shell: `source ~/.bashrc` (o apri u
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv python3-pip git
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -e .
-python -m ghosttrack        # esecuzione
+python -m argus        # esecuzione
 ```
 
 ---
@@ -87,8 +87,8 @@ python -m ghosttrack        # esecuzione
 # Se non hai Homebrew, installalo prima (consigliato):
 #   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
 chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
@@ -99,7 +99,7 @@ e poi riavvia lo script.
 
 Avvio:
 ```bash
-ghosttrack
+argus
 ```
 Se non trovato, aggiungi la cartella del launcher al profilo della shell:
 ```bash
@@ -111,13 +111,13 @@ source ~/.zshrc
 
 ```bash
 brew install python git          # oppure installa Python da python.org
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -e .
-python -m ghosttrack
+python -m argus
 ```
 
 ---
@@ -131,8 +131,8 @@ python -m ghosttrack
 2. Apri **PowerShell** ed esegui:
 
 ```powershell
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 
 # Varianti opzionali:
@@ -143,12 +143,12 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 Lo script eseguirà:
 1. Ricerca di Python 3.8+ (o installazione di Python 3.12 tramite `winget` se mancante).
 2. Creazione di un ambiente virtuale in `.\.venv`.
-3. Installazione di GhostTrack.
-4. Creazione di `ghosttrack.cmd` in `%LOCALAPPDATA%\Programs\GhostTrack\bin` e aggiunta al `PATH` utente.
+3. Installazione di Argus.
+4. Creazione di `argus.cmd` in `%LOCALAPPDATA%\Programs\Argus\bin` e aggiunta al `PATH` utente.
 
 **Apri un nuovo terminale**, poi:
 ```powershell
-ghosttrack
+argus
 ```
 
 > Se compare *"running scripts is disabled on this system"*, hai avviato
@@ -160,13 +160,13 @@ ghosttrack
 
 ```powershell
 # Installa Python 3.8+ da https://python.org (spunta "Add python.exe to PATH")
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install --upgrade pip
 pip install -e .
-python -m ghosttrack
+python -m argus
 ```
 
 ---
@@ -176,18 +176,18 @@ python -m ghosttrack
 Non serve Python in locale — basta Docker.
 
 ```bash
-git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
-docker build -t ghosttrack .
+git clone https://github.com/chiaraberti13/prova.git argus
+cd argus
+docker build -t argus .
 
 # Menu interattivo
-docker run --rm -it ghosttrack
+docker run --rm -it argus
 
 # Comando singolo
-docker run --rm ghosttrack username torvalds
+docker run --rm argus username torvalds
 
 # Salva i report sull'host (monta un volume)
-docker run --rm -v "$PWD/reports:/reports" ghosttrack ip 8.8.8.8 --export html
+docker run --rm -v "$PWD/reports:/reports" argus ip 8.8.8.8 --export html
 ```
 
 ---
@@ -195,16 +195,16 @@ docker run --rm -v "$PWD/reports:/reports" ghosttrack ip 8.8.8.8 --export html
 ## ✅ Verifica dell'installazione
 
 ```bash
-ghosttrack --version                 # stampa: GhostTrack 3.0.0
-ghosttrack phone "+390212345678"     # funziona offline — ottimo test rapido
+argus --version                 # stampa: Argus 3.0.0
+argus phone "+390212345678"     # funziona offline — ottimo test rapido
 ```
 
-Se il comando `ghosttrack` non viene trovato, puoi sempre eseguirlo esplicitamente:
+Se il comando `argus` non viene trovato, puoi sempre eseguirlo esplicitamente:
 ```bash
 # Linux/macOS
-.venv/bin/python -m ghosttrack
+.venv/bin/python -m argus
 # Windows
-.venv\Scripts\python.exe -m ghosttrack
+.venv\Scripts\python.exe -m argus
 ```
 
 ---
@@ -212,7 +212,7 @@ Se il comando `ghosttrack` non viene trovato, puoi sempre eseguirlo esplicitamen
 ## 🔄 Aggiornamento
 
 ```bash
-cd GhostTrack
+cd argus
 git pull
 # poi riavvia l'installer (idempotente) oppure, dentro il venv:
 pip install -e . --upgrade
@@ -224,14 +224,14 @@ pip install -e . --upgrade
 
 ```bash
 # Rimuovi l'ambiente virtuale e i report
-rm -rf .venv ~/ghosttrack-reports          # Windows: rmdir /s .venv
+rm -rf .venv ~/argus-reports          # Windows: rmdir /s .venv
 
 # Rimuovi il launcher
-rm ~/.local/bin/ghosttrack                 # Linux/macOS
-# Windows: elimina %LOCALAPPDATA%\Programs\GhostTrack e rimuovilo dal PATH
+rm ~/.local/bin/argus                 # Linux/macOS
+# Windows: elimina %LOCALAPPDATA%\Programs\Argus e rimuovilo dal PATH
 
 # Infine elimina la cartella clonata
-cd .. && rm -rf GhostTrack
+cd .. && rm -rf argus
 ```
 
 ---
@@ -240,11 +240,11 @@ cd .. && rm -rf GhostTrack
 
 | Sintomo | Soluzione |
 |---------|-----------|
-| `ghosttrack: command not found` | Apri un nuovo terminale, oppure aggiungi `~/.local/bin` (Linux/macOS) / la cartella del launcher (Windows) al `PATH`. Puoi sempre usare `python -m ghosttrack` dentro il venv. |
+| `argus: command not found` | Apri un nuovo terminale, oppure aggiungi `~/.local/bin` (Linux/macOS) / la cartella del launcher (Windows) al `PATH`. Puoi sempre usare `python -m argus` dentro il venv. |
 | `python3: command not found` (Linux) | `sudo apt install python3 python3-venv python3-pip` |
 | Errore pip `externally-managed-environment` | È previsto sulle distro moderne — proprio per questo usiamo un **ambiente virtuale**. Non installare con pip a livello globale; usa l'installer o il venv. |
 | PowerShell: *running scripts is disabled* | Esegui con `-ExecutionPolicy Bypass` (mostrato sopra) o `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. |
-| Errori SSL / proxy dietro un proxy aziendale | Imposta `HTTPS_PROXY`, o come ultima risorsa `GHOSTTRACK_NO_VERIFY_SSL=1` (sconsigliato). |
+| Errori SSL / proxy dietro un proxy aziendale | Imposta `HTTPS_PROXY`, o come ultima risorsa `ARGUS_NO_VERIFY_SSL=1` (sconsigliato). |
 | I risultati username sembrano falsi positivi | Alcuni siti rispondono HTTP 200 a qualsiasi URL. Aumenta `--timeout`, oppure affina la voce del sito in `data/sites.json` usando il metodo di rilevamento `text`. |
 | Il modulo email indica MX = *unknown* | Installa la dipendenza opzionale: `pip install dnspython` (o reinstalla con `--with-dns`). |
 

@@ -2,8 +2,8 @@
 
 Configuration is loaded from (in order of precedence):
   1. CLI flags
-  2. Environment variables (GHOSTTRACK_*)
-  3. A JSON config file (~/.config/ghosttrack/config.json)
+  2. Environment variables (ARGUS_*)
+  3. A JSON config file (~/.config/argus/config.json)
   4. Built-in defaults
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ def config_dir() -> Path:
         base = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
     else:
         base = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
-    return base / "ghosttrack"
+    return base / "argus"
 
 
 CONFIG_PATH = config_dir() / "config.json"
@@ -30,9 +30,10 @@ class Config:
     timeout: float = 8.0
     max_workers: int = 20
     user_agent: str = (
-        "Mozilla/5.0 (compatible; GhostTrack/3.0; +https://github.com/HunxByts/GhostTrack)"
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
     )
-    output_dir: str = str(Path.home() / "ghosttrack-reports")
+    output_dir: str = str(Path.home() / "argus-reports")
     verify_ssl: bool = True
     retries: int = 2
 
@@ -50,11 +51,11 @@ class Config:
                 pass
         # 2. environment overrides
         env_map = {
-            "GHOSTTRACK_TIMEOUT": ("timeout", float),
-            "GHOSTTRACK_MAX_WORKERS": ("max_workers", int),
-            "GHOSTTRACK_USER_AGENT": ("user_agent", str),
-            "GHOSTTRACK_OUTPUT_DIR": ("output_dir", str),
-            "GHOSTTRACK_RETRIES": ("retries", int),
+            "ARGUS_TIMEOUT": ("timeout", float),
+            "ARGUS_MAX_WORKERS": ("max_workers", int),
+            "ARGUS_USER_AGENT": ("user_agent", str),
+            "ARGUS_OUTPUT_DIR": ("output_dir", str),
+            "ARGUS_RETRIES": ("retries", int),
         }
         for env, (attr, cast) in env_map.items():
             if env in os.environ:
@@ -62,7 +63,7 @@ class Config:
                     setattr(cfg, attr, cast(os.environ[env]))
                 except ValueError:
                     pass
-        if os.environ.get("GHOSTTRACK_NO_VERIFY_SSL"):
+        if os.environ.get("ARGUS_NO_VERIFY_SSL"):
             cfg.verify_ssl = False
         return cfg
 

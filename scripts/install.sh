@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-# GhostTrack automated installer for Ubuntu/Debian Linux and macOS.
+# Argus automated installer for Ubuntu/Debian Linux and macOS.
 #
 # What it does (idempotent — safe to re-run):
 #   1. Detects the OS and package manager.
 #   2. Ensures Python 3.8+, pip and venv are available (auto-installs on
 #      Ubuntu/Debian via apt, on macOS via Homebrew if present).
 #   3. Creates an isolated virtual environment in ./.venv.
-#   4. Installs GhostTrack and its dependencies into that venv.
-#   5. Installs a `ghosttrack` launcher into ~/.local/bin (added to PATH).
+#   4. Installs Argus and its dependencies into that venv.
+#   5. Installs a `argus` launcher into ~/.local/bin (added to PATH).
 #
 # Usage:
 #   ./scripts/install.sh            # normal install
@@ -46,7 +46,7 @@ for arg in "$@"; do
   esac
 done
 
-echo "${BOLD}GhostTrack installer${RESET}"
+echo "${BOLD}Argus installer${RESET}"
 info "Repository: $REPO_DIR"
 
 # ------------------------------------------------------------- detect OS ----
@@ -100,7 +100,7 @@ source "$VENV_DIR/bin/activate"
 python -m pip install --upgrade pip >/dev/null
 
 # ------------------------------------------------------ install package -----
-info "Installing GhostTrack and dependencies …"
+info "Installing Argus and dependencies …"
 pip install -e "$REPO_DIR"
 [ "$WITH_DNS" = "1" ] && { info "Installing dnspython (better email OSINT) …"; pip install "dnspython>=2.4.0"; }
 [ "$DEV" = "1" ] && { info "Installing dev tools …"; pip install "pytest>=7.0" "pytest-mock>=3.10" "ruff>=0.1.0"; }
@@ -108,12 +108,12 @@ ok "Package installed into virtualenv."
 
 # ------------------------------------------------- global launcher ----------
 mkdir -p "$BIN_DIR"
-LAUNCHER="$BIN_DIR/ghosttrack"
+LAUNCHER="$BIN_DIR/argus"
 cat > "$LAUNCHER" <<EOF
 #!/usr/bin/env bash
-# Auto-generated GhostTrack launcher
+# Auto-generated Argus launcher
 source "$VENV_DIR/bin/activate"
-exec python -m ghosttrack "\$@"
+exec python -m argus "\$@"
 EOF
 chmod +x "$LAUNCHER"
 ok "Launcher installed: $LAUNCHER"
@@ -132,6 +132,6 @@ esac
 
 echo
 ok "${BOLD}Installation complete!${RESET}"
-echo "  Run it with:            ${CYAN}ghosttrack${RESET}"
-echo "  Or a one-off command:   ${CYAN}ghosttrack ip 8.8.8.8${RESET}"
-echo "  Without the launcher:   ${CYAN}$VENV_DIR/bin/python -m ghosttrack${RESET}"
+echo "  Run it with:            ${CYAN}argus${RESET}"
+echo "  Or a one-off command:   ${CYAN}argus ip 8.8.8.8${RESET}"
+echo "  Without the launcher:   ${CYAN}$VENV_DIR/bin/python -m argus${RESET}"

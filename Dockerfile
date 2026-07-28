@@ -1,11 +1,11 @@
-# GhostTrack — minimal container image.
-#   docker build -t ghosttrack .
-#   docker run --rm -it ghosttrack               # interactive menu
-#   docker run --rm ghosttrack ip 8.8.8.8        # one-off command
+# Argus — minimal container image.
+#   docker build -t argus .
+#   docker run --rm -it argus               # interactive menu
+#   docker run --rm argus ip 8.8.8.8        # one-off command
 FROM python:3.12-slim
 
-LABEL org.opencontainers.image.title="GhostTrack" \
-      org.opencontainers.image.description="Improved cross-platform OSINT toolkit" \
+LABEL org.opencontainers.image.title="Argus" \
+      org.opencontainers.image.description="The all-seeing OSINT & reconnaissance toolkit" \
       org.opencontainers.image.licenses="MIT"
 
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY . .
 RUN pip install --no-cache-dir -e .
 
 # Reports land here; mount a volume to keep them: -v $PWD/reports:/reports
-ENV GHOSTTRACK_OUTPUT_DIR=/reports
+ENV ARGUS_OUTPUT_DIR=/reports
 VOLUME ["/reports"]
 
-ENTRYPOINT ["python", "-m", "ghosttrack"]
+ENTRYPOINT ["python", "-m", "argus"]
