@@ -132,7 +132,7 @@ Resolved in order: **CLI flags → environment variables → config file → def
 | Request timeout (s) | `--timeout` | `ARGUS_TIMEOUT` | `8.0` |
 | Concurrent workers | `--workers` | `ARGUS_MAX_WORKERS` | `20` |
 | Retries | — | `ARGUS_RETRIES` | `2` |
-| Output directory | — | `ARGUS_OUTPUT_DIR` | `~/argus-reports` |
+| Output directory | — | `ARGUS_OUTPUT_DIR` | `<script folder>/report` |
 | User-Agent | — | `ARGUS_USER_AGENT` | browser UA |
 | Disable SSL verify | — | `ARGUS_NO_VERIFY_SSL=1` | (verify on) |
 
@@ -278,7 +278,7 @@ Risolta in quest'ordine: **flag CLI → variabili d'ambiente → file di config 
 | Timeout richiesta (s) | `--timeout` | `ARGUS_TIMEOUT` | `8.0` |
 | Worker concorrenti | `--workers` | `ARGUS_MAX_WORKERS` | `20` |
 | Retry | — | `ARGUS_RETRIES` | `2` |
-| Cartella di output | — | `ARGUS_OUTPUT_DIR` | `~/argus-reports` |
+| Cartella di output | — | `ARGUS_OUTPUT_DIR` | `<cartella script>/report` |
 | User-Agent | — | `ARGUS_USER_AGENT` | UA browser |
 | Disattiva verifica SSL | — | `ARGUS_NO_VERIFY_SSL=1` | (verifica attiva) |
 

@@ -110,8 +110,8 @@ argus config --init      # write ~/.config/argus/config.json
 ```
 
 ### Reports
-Reports are saved to `~/argus-reports/` by default (change with
-`ARGUS_OUTPUT_DIR`). The HTML report is a standalone dark-themed page with
+Reports are saved to a `report/` folder inside the script's folder by default
+(change with `ARGUS_OUTPUT_DIR`). The HTML report is a standalone dark-themed page with
 clickable links — great for sharing findings.
 
 ### Automation example
@@ -232,8 +232,8 @@ argus config --init      # crea ~/.config/argus/config.json
 ```
 
 ### Report
-I report vengono salvati per default in `~/argus-reports/` (modificabile con
-`ARGUS_OUTPUT_DIR`). Il report HTML è una pagina autonoma con tema scuro e
+I report vengono salvati per default nella cartella `report/` all'interno della
+cartella dello script (modificabile con `ARGUS_OUTPUT_DIR`). Il report HTML è una pagina autonoma con tema scuro e
 link cliccabili — perfetta per condividere i risultati.
 
 ### Esempio di automazione

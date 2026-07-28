@@ -21,6 +21,7 @@ htmlcov/
 
 # Argus output
 argus-reports/
+report/
 
 # OS / editor
 .DS_Store
