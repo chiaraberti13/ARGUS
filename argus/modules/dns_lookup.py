@@ -65,6 +65,9 @@ def lookup(
             any_answer = True
 
     if not records and not any_answer:
-        return {"error": "no DNS answers (domain may not exist or DoH is blocked)", "domain": domain}
+        return {
+            "error": "no DNS answers (domain may not exist or DoH is blocked)",
+            "domain": domain,
+        }
 
     return {"domain": domain, "records": records, "source": "cloudflare/google DoH"}

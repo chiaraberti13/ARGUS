@@ -9,18 +9,19 @@ from pathlib import Path
 
 import pytest
 
-from argus import utils
+from argus import exporters, utils
 from argus.config import Config
 from argus.modules import (
-    phone_tracker,
-    username_tracker,
+    dns_lookup,
     email_osint,
     mac_lookup,
-    domain as domain_mod,
-    dns_lookup,
+    phone_tracker,
+    username_tracker,
     web_recon,
 )
-from argus import exporters
+from argus.modules import (
+    domain as domain_mod,
+)
 
 
 # --------------------------- validation helpers --------------------------- #

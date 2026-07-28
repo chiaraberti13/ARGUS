@@ -11,7 +11,7 @@ from typing import Optional
 
 import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
-from phonenumbers.phonenumberutil import number_type, PhoneNumberType
+from phonenumbers.phonenumberutil import PhoneNumberType, number_type
 
 from ..utils import normalize_phone
 

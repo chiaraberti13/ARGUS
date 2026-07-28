@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Optional
 
 from ..config import Config
-from ..utils import build_session, is_valid_ip, is_public_ip
+from ..utils import build_session, is_public_ip, is_valid_ip
 
 PRIMARY = "https://ipwho.is/{ip}"
 FALLBACK = "http://ip-api.com/json/{ip}?fields=status,message,country,regionName,city,zip,lat,lon,timezone,isp,org,as,query"

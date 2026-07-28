@@ -10,10 +10,10 @@ import sys
 from typing import Iterable, Sequence
 
 try:  # pragma: no cover - exercised implicitly
-    from rich.console import Console
-    from rich.table import Table
-    from rich.panel import Panel
     from rich import box
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
 
     _RICH = True
     _console = Console()
@@ -141,9 +141,9 @@ def progress_iter(iterable, description: str, total: int | None = None):
     """Yield from `iterable` while showing a progress bar (rich) or dots."""
     if _RICH:
         from rich.progress import (
+            BarColumn,
             Progress,
             SpinnerColumn,
-            BarColumn,
             TextColumn,
             TimeElapsedColumn,
         )
