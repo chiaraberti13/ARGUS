@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 GhostTrack contributors
+Copyright (c) 2026 Argus contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,5 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-This project is an independent, improved reimplementation inspired by the
-original GhostTrack by HunxByts. It is intended for authorized security
-research, OSINT training and educational purposes only.
+Argus is an independent project intended for authorized security research,
+OSINT training and educational purposes only. See docs/DISCLAIMER.md.

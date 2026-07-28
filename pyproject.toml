@@ -3,13 +3,13 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ghosttrack"
+name = "argus"
 version = "3.0.0"
-description = "Improved cross-platform OSINT & information-gathering toolkit (IP, phone, username, email)."
+description = "The all-seeing OSINT & reconnaissance toolkit (IP, domain, DNS, phone, username, email, web, MAC)."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
-authors = [{ name = "GhostTrack contributors" }]
+authors = [{ name = "Argus contributors" }]
 keywords = ["osint", "security", "recon", "information-gathering", "cli"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -31,16 +31,16 @@ dns = ["dnspython>=2.4.0"]
 dev = ["pytest>=7.0", "pytest-mock>=3.10", "ruff>=0.1.0"]
 
 [project.urls]
-Homepage = "https://github.com/HunxByts/GhostTrack"
+Homepage = "https://github.com/chiaraberti13/prova"
 
 [project.scripts]
-ghosttrack = "ghosttrack.cli:main"
+argus = "argus.cli:main"
 
 [tool.setuptools]
-packages = ["ghosttrack", "ghosttrack.modules"]
+packages = ["argus", "argus.modules"]
 
 [tool.setuptools.package-data]
-ghosttrack = ["../data/sites.json"]
+argus = ["../data/sites.json"]
 
 [tool.ruff]
 line-length = 100

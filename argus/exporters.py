@@ -50,7 +50,7 @@ def to_csv(data: dict, kind: str, config: Config) -> Path:
 _HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GhostTrack report — {kind}</title>
+<title>Argus report — {kind}</title>
 <style>
   :root {{ color-scheme: light dark; }}
   body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -70,10 +70,10 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   footer {{ padding: 16px 32px; color: #565f89; font-size: .8rem; text-align: center; }}
 </style></head>
 <body>
-<header><h1>GhostTrack — {kind} report</h1>
+<header><h1>Argus — {kind} report</h1>
 <div class="meta">Generated {when} · authorized / educational use only</div></header>
 <main>{body}</main>
-<footer>GhostTrack improved edition · Use responsibly and legally.</footer>
+<footer>Argus · Use responsibly and legally.</footer>
 </body></html>
 """
 

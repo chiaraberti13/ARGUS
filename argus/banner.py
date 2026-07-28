@@ -5,14 +5,14 @@ from . import __version__
 from . import ui
 
 BANNER = r"""
-   ____ _               _     _____                _
-  / ___| |__   ___  ___| |_  |_   _| __ __ _  ___| | __
- | |  _| '_ \ / _ \/ __| __|   | || '__/ _` |/ __| |/ /
- | |_| | | | | (_) \__ \ |_    | || | | (_| | (__|   <
-  \____|_| |_|\___/|___/\__|   |_||_|  \__,_|\___|_|\_\
+     _    ____   ____ _   _ ____
+    / \  |  _ \ / ___| | | / ___|
+   / _ \ | |_) | |  _| | | \___ \
+  / ___ \|  _ <| |_| | |_| |___) |
+ /_/   \_\_| \_\\____|\___/|____/
 """
 
-TAGLINE = "OSINT & information-gathering toolkit — improved edition"
+TAGLINE = "The all-seeing OSINT & reconnaissance toolkit"
 
 
 def show() -> None:

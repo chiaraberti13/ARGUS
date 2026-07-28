@@ -1,6 +1,6 @@
 """Phone number intelligence using the `phonenumbers` library.
 
-Improvements over the original:
+Features:
   * Robust parsing with a clear error for un-parseable input.
   * Returns validity, line type (mobile/fixed/VoIP…), carrier, region,
     timezones and multiple canonical formats as structured data.

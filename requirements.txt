@@ -1,4 +1,4 @@
-# Core runtime dependencies for GhostTrack (improved edition)
+# Core runtime dependencies for Argus
 requests>=2.31.0
 phonenumbers>=8.13.0
 rich>=13.0.0

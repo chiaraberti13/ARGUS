@@ -8,10 +8,20 @@ from typing import Optional
 from . import __version__, banner, ui
 from .config import Config
 from .exporters import export
-from .modules import email_osint, ip_tracker, myip, phone_tracker, username_tracker
+from .modules import (
+    dns_lookup,
+    domain as domain_mod,
+    email_osint,
+    ip_tracker,
+    mac_lookup,
+    myip,
+    phone_tracker,
+    username_tracker,
+    web_recon,
+)
 
 DISCLAIMER = (
-    "GhostTrack is provided for authorized security research, OSINT training and "
+    "Argus is provided for authorized security research, OSINT training and "
     "educational purposes only. You are solely responsible for complying with all "
     "applicable laws. Only gather information you are legally permitted to access."
 )
@@ -120,17 +130,88 @@ def render_myip(data: dict) -> None:
         render_ip(data["geo"])
 
 
+def render_domain(data: dict) -> None:
+    if "error" in data:
+        ui.error(data["error"])
+        return
+    status = data.get("status")
+    rows = [
+        ("Domain", data.get("domain")),
+        ("Registrar", data.get("registrar")),
+        ("Registered", data.get("registered")),
+        ("Expires", data.get("expires")),
+        ("Last changed", data.get("last_changed")),
+        ("Name servers", ", ".join(data["nameservers"]) if data.get("nameservers") else None),
+        ("Status", ", ".join(status) if status else None),
+        ("DNSSEC", {True: "signed", False: "unsigned", None: "unknown"}.get(data.get("dnssec"))),
+        ("Source", data.get("source")),
+    ]
+    ui.kv_table([(k, v) for k, v in rows if v], title="Domain / WHOIS (RDAP)")
+
+
+def render_dns(data: dict) -> None:
+    if "error" in data:
+        ui.error(data["error"])
+        return
+    rows = []
+    for rtype, values in data.get("records", {}).items():
+        for value in values:
+            rows.append((rtype, value))
+    ui.results_table(["Type", "Value"], rows, title=f"DNS records for {data['domain']}")
+
+
+def render_web(data: dict) -> None:
+    if "error" in data:
+        ui.error(data["error"])
+        return
+    present = data.get("security_headers_present") or {}
+    missing = data.get("security_headers_missing") or []
+    rows = [
+        ("URL", data.get("url")),
+        ("Final URL", data.get("final_url")),
+        ("Status", f"{data.get('status_code')} {data.get('reason') or ''}".strip()),
+        ("Host", data.get("host")),
+        ("Resolved IP", data.get("ip")),
+        ("Redirected", "yes" if data.get("redirected") else "no"),
+        ("Server", data.get("server")),
+        ("Content-Type", data.get("content_type")),
+        ("Security headers", f"{len(present)} present, {len(missing)} missing"),
+    ]
+    ui.kv_table([(k, v) for k, v in rows if v not in (None, "")], title="Web / HTTP Recon")
+    if missing:
+        ui.warn("Missing security headers: " + ", ".join(missing))
+
+
+def render_mac(data: dict) -> None:
+    if "error" in data:
+        ui.error(data["error"])
+        return
+    rows = [
+        ("MAC", data.get("mac")),
+        ("OUI", data.get("oui")),
+        ("Vendor", data.get("vendor")),
+        ("Locally administered", "yes" if data.get("locally_administered") else "no"),
+        ("Multicast", "yes" if data.get("multicast") else "no"),
+        ("Source", data.get("source")),
+    ]
+    ui.kv_table([(k, v) for k, v in rows if v], title="MAC Vendor Lookup")
+
+
 # --------------------------------------------------------------------------- #
 # Interactive menu
 # --------------------------------------------------------------------------- #
 MENU = """
-  [bold cyan]1[/bold cyan]  IP address geolocation
-  [bold cyan]2[/bold cyan]  Phone number intelligence
-  [bold cyan]3[/bold cyan]  Username lookup (50+ sites)
-  [bold cyan]4[/bold cyan]  Email OSINT
-  [bold cyan]5[/bold cyan]  Show my public IP
-  [bold cyan]6[/bold cyan]  Settings
-  [bold cyan]0[/bold cyan]  Exit
+  [bold cyan] 1[/bold cyan]  IP address geolocation
+  [bold cyan] 2[/bold cyan]  Phone number intelligence
+  [bold cyan] 3[/bold cyan]  Username lookup (50+ sites)
+  [bold cyan] 4[/bold cyan]  Email OSINT
+  [bold cyan] 5[/bold cyan]  Domain / WHOIS (RDAP)
+  [bold cyan] 6[/bold cyan]  DNS records (DoH)
+  [bold cyan] 7[/bold cyan]  Web / HTTP recon
+  [bold cyan] 8[/bold cyan]  MAC vendor lookup
+  [bold cyan] 9[/bold cyan]  Show my public IP
+  [bold cyan]10[/bold cyan]  Settings
+  [bold cyan] 0[/bold cyan]  Exit
 """
 
 
@@ -146,7 +227,7 @@ def interactive(config: Config) -> int:
     while True:
         ui.echo(MENU)
         try:
-            choice = ui.prompt("ghosttrack ›").strip()
+            choice = ui.prompt("argus ›").strip()
         except (EOFError, KeyboardInterrupt):
             ui.echo("\nBye.")
             return 0
@@ -173,9 +254,29 @@ def interactive(config: Config) -> int:
                 render_email(data)
                 _maybe_export(data, "email", config, _ask_export(config))
             elif choice == "5":
+                dom = ui.prompt("Domain name (example.com):")
+                data = domain_mod.lookup(dom, config)
+                render_domain(data)
+                _maybe_export(data, "domain", config, _ask_export(config))
+            elif choice == "6":
+                dom = ui.prompt("Domain name (example.com):")
+                data = dns_lookup.lookup(dom, config)
+                render_dns(data)
+                _maybe_export(data, "dns", config, _ask_export(config))
+            elif choice == "7":
+                target = ui.prompt("URL or host (example.com):")
+                data = web_recon.lookup(target, config)
+                render_web(data)
+                _maybe_export(data, "web", config, _ask_export(config))
+            elif choice == "8":
+                mac = ui.prompt("MAC address (aa:bb:cc:dd:ee:ff):")
+                data = mac_lookup.lookup(mac, config)
+                render_mac(data)
+                _maybe_export(data, "mac", config, _ask_export(config))
+            elif choice == "9":
                 data = myip.my_ip(config)
                 render_myip(data)
-            elif choice == "6":
+            elif choice == "10":
                 _settings_menu(config)
             elif choice in {"0", "q", "exit", "quit"}:
                 ui.echo("Bye.")
@@ -237,7 +338,7 @@ def _settings_menu(config: Config) -> None:
         ("user_agent", config.user_agent),
     ]
     ui.kv_table(rows, title="Current settings")
-    ui.info("Edit config file to persist changes: use 'ghosttrack config --show'.")
+    ui.info("Edit config file to persist changes: use 'argus config --show'.")
 
 
 # --------------------------------------------------------------------------- #
@@ -272,12 +373,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     p = argparse.ArgumentParser(
-        prog="ghosttrack",
-        description="GhostTrack — improved cross-platform OSINT toolkit.",
+        prog="argus",
+        description="Argus — the all-seeing OSINT & reconnaissance toolkit.",
         epilog="Run without a subcommand to launch the interactive menu.",
         parents=[common],
     )
-    p.add_argument("--version", action="version", version=f"GhostTrack {__version__}")
+    p.add_argument("--version", action="version", version=f"Argus {__version__}")
 
     sub = p.add_subparsers(dest="command")
 
@@ -292,6 +393,22 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("name")
 
     sp = sub.add_parser("email", help="passive email OSINT", parents=[common])
+    sp.add_argument("address")
+
+    sp = sub.add_parser("domain", help="domain / WHOIS lookup via RDAP", parents=[common])
+    sp.add_argument("name")
+
+    sp = sub.add_parser("dns", help="DNS records via DNS-over-HTTPS", parents=[common])
+    sp.add_argument("name")
+    sp.add_argument(
+        "--types",
+        help="comma-separated record types (default: A,AAAA,MX,TXT,NS,CNAME,SOA)",
+    )
+
+    sp = sub.add_parser("web", help="website / HTTP reconnaissance", parents=[common])
+    sp.add_argument("url")
+
+    sp = sub.add_parser("mac", help="MAC address vendor lookup", parents=[common])
     sp.add_argument("address")
 
     sub.add_parser("myip", help="show this machine's public IP", parents=[common])
@@ -336,6 +453,23 @@ def main(argv: Optional[list[str]] = None) -> int:
         data = email_osint.lookup(args.address, config)
         render_email(data)
         _maybe_export(data, "email", config, export_fmt)
+    elif args.command == "domain":
+        data = domain_mod.lookup(args.name, config)
+        render_domain(data)
+        _maybe_export(data, "domain", config, export_fmt)
+    elif args.command == "dns":
+        types = [t.strip().upper() for t in args.types.split(",")] if getattr(args, "types", None) else None
+        data = dns_lookup.lookup(args.name, config, types=types)
+        render_dns(data)
+        _maybe_export(data, "dns", config, export_fmt)
+    elif args.command == "web":
+        data = web_recon.lookup(args.url, config)
+        render_web(data)
+        _maybe_export(data, "web", config, export_fmt)
+    elif args.command == "mac":
+        data = mac_lookup.lookup(args.address, config)
+        render_mac(data)
+        _maybe_export(data, "mac", config, export_fmt)
     elif args.command == "myip":
         data = myip.my_ip(config)
         render_myip(data)

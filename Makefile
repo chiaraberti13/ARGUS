@@ -1,4 +1,4 @@
-# GhostTrack — developer convenience targets.
+# Argus — developer convenience targets.
 # Usage: make <target>
 
 PYTHON ?= python3
@@ -24,7 +24,7 @@ venv: ## Create venv and install package in editable mode
 
 .PHONY: run
 run: ## Launch the interactive menu
-	$(BIN)/python -m ghosttrack
+	$(BIN)/python -m argus
 
 .PHONY: test
 test: ## Run the offline test suite
@@ -32,7 +32,7 @@ test: ## Run the offline test suite
 
 .PHONY: lint
 lint: ## Lint with ruff
-	$(BIN)/ruff check ghosttrack tests
+	$(BIN)/ruff check argus tests
 
 .PHONY: clean
 clean: ## Remove venv, caches and build artifacts
@@ -41,4 +41,4 @@ clean: ## Remove venv, caches and build artifacts
 
 .PHONY: docker
 docker: ## Build the Docker image
-	docker build -t ghosttrack:latest .
+	docker build -t argus:latest .

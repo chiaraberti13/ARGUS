@@ -1,6 +1,6 @@
 """Concurrent username lookup across many platforms.
 
-Improvements over the original (which checked ~24 sites sequentially):
+Features:
   * Loads its target list from ``data/sites.json`` (50+ sites, easy to extend).
   * Checks sites concurrently with a thread pool — dramatically faster.
   * Supports two detection strategies (HTTP status and body-text matching)
@@ -32,7 +32,7 @@ def load_sites() -> list[dict]:
         return data.get("sites", [])
     # Fallback: packaged data (if shipped inside the wheel).
     try:
-        with resources.files("ghosttrack").joinpath("../data/sites.json").open(
+        with resources.files("argus").joinpath("../data/sites.json").open(
             "r", encoding="utf-8"
         ) as fh:  # pragma: no cover
             return json.load(fh).get("sites", [])

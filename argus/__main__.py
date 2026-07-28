@@ -1,4 +1,4 @@
-"""Enable `python -m ghosttrack`."""
+"""Enable `python -m argus`."""
 import sys
 
 from .cli import main

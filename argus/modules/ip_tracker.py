@@ -1,6 +1,6 @@
 """IP geolocation lookup.
 
-Improvements over the original:
+Features:
   * Uses HTTPS and a resilient session with retries.
   * Falls back to a second provider if the first fails.
   * Validates input and refuses obviously private/reserved addresses with a warning.
