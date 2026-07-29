@@ -5,11 +5,12 @@ Run with:  pytest -q
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 
 import pytest
 
-from argus import exporters, utils
+from argus import exporters, updater, utils
 from argus.config import Config
 from argus.modules import (
     dns_lookup,
@@ -86,18 +87,89 @@ def test_email_hashes_are_deterministic():
 
 # ------------------------- username site catalogue ------------------------ #
 def test_sites_catalogue_is_valid():
-    sites = username_tracker.load_sites()
+    catalogue = username_tracker.load_catalogue()
+    assert catalogue.get("version", 0) >= 1
+    sites = catalogue.get("sites", [])
     assert len(sites) >= 40
+    valid = {"status_code", "message", "response_url", "status", "text"}
     for site in sites:
         assert "{username}" in site["url"]
         assert site["name"]
-        assert site.get("method", "status") in {"status", "text"}
+        etype = site.get("errorType") or site.get("method", "status_code")
+        assert etype in valid
+        # message-detection sites must declare what marks an absent profile.
+        if etype in {"message", "text"}:
+            assert site.get("errorMsg") or site.get("absence")
 
 
 def test_username_empty_returns_error(monkeypatch):
     # Feed an empty site list to avoid any network activity.
     data = username_tracker.lookup("someone", sites=[])
     assert "error" in data
+
+
+class _FakeResp:
+    def __init__(self, status_code=200, text="", url="", history=None):
+        self.status_code = status_code
+        self.text = text
+        self.url = url
+        self.history = history or []
+
+
+def test_detection_status_code():
+    site = {"name": "X", "url": "https://x/{username}", "errorType": "status_code"}
+    assert username_tracker._classify(site, _FakeResp(200)) == "found"
+    assert username_tracker._classify(site, _FakeResp(404)) == "not found"
+    # A redirect on a status_code site means the profile is not there.
+    assert username_tracker._classify(site, _FakeResp(200, history=["r"])) == "not found"
+
+
+def test_detection_blocked_is_not_a_result():
+    site = {"name": "X", "url": "https://x/{username}", "errorType": "status_code"}
+    for code in (401, 403, 429, 451):
+        assert username_tracker._classify(site, _FakeResp(code)) == "blocked"
+
+
+def test_detection_message():
+    site = {"name": "X", "url": "https://x/{username}", "errorType": "message",
+            "errorMsg": "No such user."}
+    assert username_tracker._classify(site, _FakeResp(200, text="welcome")) == "found"
+    assert username_tracker._classify(site, _FakeResp(200, text="No such user.")) == "not found"
+
+
+def test_detection_response_url():
+    site = {"name": "X", "url": "https://x/{username}", "errorType": "response_url",
+            "errorUrl": "https://x/login"}
+    assert username_tracker._classify(
+        site, _FakeResp(200, url="https://x/alice", history=["r"])
+    ) == "found"
+    assert username_tracker._classify(
+        site, _FakeResp(200, url="https://x/login", history=["r"])
+    ) == "not found"
+
+
+def test_legacy_method_keys_still_work():
+    site = {"name": "X", "url": "https://x/{username}", "method": "text", "absence": "gone"}
+    assert username_tracker._classify(site, _FakeResp(200, text="hi")) == "found"
+    assert username_tracker._classify(site, _FakeResp(200, text="gone")) == "not found"
+
+
+def test_lookup_counts_blocked(monkeypatch):
+    sites = [
+        {"name": "A", "url": "https://a/{username}", "errorType": "status_code"},
+        {"name": "B", "url": "https://b/{username}", "errorType": "status_code"},
+    ]
+
+    def fake_check(session, site, username, timeout):
+        status = "found" if site["name"] == "A" else "blocked"
+        return {"site": site["name"], "url": site["url"], "category": "misc",
+                "status": status, "http_status": 200}
+
+    monkeypatch.setattr(username_tracker, "_check_one", fake_check)
+    monkeypatch.setattr(username_tracker, "build_session", lambda cfg: object())
+    data = username_tracker.lookup("bob", sites=sites)
+    assert data["found_count"] == 1
+    assert data["blocked_count"] == 1
 
 
 # ------------------------------ MAC module -------------------------------- #
@@ -167,6 +239,37 @@ def test_export_rejects_unknown_format(tmp_path):
     cfg = Config(output_dir=str(tmp_path))
     with pytest.raises(ValueError):
         exporters.export({"a": 1}, "x", "xml", cfg)
+
+
+# -------------------------------- updater --------------------------------- #
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        ("2.31.0", "2.32.0", True),
+        ("2.32.0", "2.31.0", False),
+        ("13.0.0", "13.0.0", False),
+        ("8.13.0", "8.13.1", True),
+        ("2.4.0b1", "2.4.0", False),
+    ],
+)
+def test_version_comparison(a, b, expected):
+    assert updater._version_lt(a, b) is expected
+
+
+def test_check_dependencies_reports_known_packages():
+    report = updater.check_dependencies()
+    names = {d["package"] for d in report}
+    assert {"requests", "phonenumbers", "rich"} <= names
+    for d in report:
+        assert set(d) >= {"package", "installed", "outdated", "missing", "optional"}
+
+
+def test_check_for_updates_is_cached(monkeypatch, tmp_path):
+    # Force the state file into a temp dir and simulate a very recent check.
+    monkeypatch.setattr(updater, "_STATE_PATH", tmp_path / "state.json")
+    updater._save_state({"last_update_check": time.time()})
+    result = updater.check_for_updates(Config(), force=False)
+    assert result["skipped"] is True and result["checked"] is False
 
 
 # -------------------------------- config ---------------------------------- #

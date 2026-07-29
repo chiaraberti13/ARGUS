@@ -45,6 +45,13 @@ class Config:
     output_dir: str = str(default_output_dir())
     verify_ssl: bool = True
     retries: int = 2
+    # Update behaviour. `update_check` prints a one-line hint at startup when a
+    # newer dependency release exists (non-blocking, cached). `auto_update`
+    # additionally upgrades dependencies automatically on launch — opt-in,
+    # because it is slow and needs the network.
+    update_check: bool = True
+    update_check_interval_days: int = 1
+    auto_update: bool = False
 
     @classmethod
     def load(cls) -> "Config":
@@ -74,6 +81,10 @@ class Config:
                     pass
         if os.environ.get("ARGUS_NO_VERIFY_SSL"):
             cfg.verify_ssl = False
+        if os.environ.get("ARGUS_NO_UPDATE_CHECK"):
+            cfg.update_check = False
+        if os.environ.get("ARGUS_AUTO_UPDATE"):
+            cfg.auto_update = True
         return cfg
 
     def save(self) -> Path:
