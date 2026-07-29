@@ -67,6 +67,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   a {{ color: #7dcfff; }}
   .found {{ color: #9ece6a; font-weight: 600; }}
   .missing {{ color: #565f89; }}
+  .blocked {{ color: #e0af68; font-weight: 600; }}
   footer {{ padding: 16px 32px; color: #565f89; font-size: .8rem; text-align: center; }}
 </style></head>
 <body>
@@ -90,7 +91,8 @@ def _dict_to_html_table(data: dict) -> str:
 def _username_results_to_html(data: dict) -> str:
     rows = []
     for r in data.get("results", []):
-        cls = "found" if r.get("status") == "found" else "missing"
+        status = r.get("status")
+        cls = {"found": "found", "blocked": "blocked"}.get(status, "missing")
         link = html.escape(r.get("url", ""))
         rows.append(
             f"<tr><td>{html.escape(str(r.get('site')))}</td>"

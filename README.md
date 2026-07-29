@@ -66,13 +66,42 @@ JSON / CSV / HTML report.
 | `domain` | Domain / WHOIS data via **RDAP**: registrar, creation/expiry dates, name servers, status, DNSSEC |
 | `dns` | Resolve A / AAAA / MX / TXT / NS / CNAME / SOA records via **DNS-over-HTTPS** |
 | `phone` | Phone-number intelligence: validity, line type, carrier, region, timezones, 4 formats (**offline**) |
-| `username` | Hunt a username across **50+ sites concurrently** and list where it exists |
+| `username` | Hunt a username across **50+ sites concurrently** with per-site detection (status / body-text / redirect) and an honest **blocked** state for anti-bot sites |
 | `email` | Passive email OSINT: syntax, MX (mail-capable domain), Gravatar |
 | `web` | Website / HTTP recon: status, redirects, server, **security-header audit**, resolved IP |
 | `mac` | MAC address → hardware **vendor** (OUI), local/multicast flags |
 | `myip` | Discover and geolocate **your own** public IP |
+| `update` | Upgrade dependencies and refresh the username site list (`--check` for a dry run) |
 
 Every result can be exported with `--export json|csv|html`.
+
+#### Reliable username detection
+
+Naive "HTTP 200 = the profile exists" checks are wrong for most big platforms,
+which answer `200` for every URL, redirect unknown users, or block bots. Argus
+uses a per-site model (`errorType` in `data/sites.json`):
+
+- **`status_code`** — exists only on a 2xx that was *not* redirected away.
+- **`message`** — the page is always 200, so a marker string in the body decides.
+- **`response_url`** — a missing profile is detected by its redirect target.
+
+Anti-bot / rate-limit responses (401/403/406/429/451) are reported as
+**`blocked`** — an explicit "unknown" — instead of being miscounted as found or
+absent, so a result never claims more certainty than it has.
+
+#### Staying up to date
+
+```bash
+argus update            # upgrade dependencies + refresh the site list
+argus update --check    # report what's outdated, change nothing
+argus update --sites    # refresh only the username catalogue
+```
+
+On launch, the interactive menu prints a **non-blocking** one-line hint when a
+newer dependency release exists (cached once per day, disable with
+`ARGUS_NO_UPDATE_CHECK=1`). Set `auto_update: true` in the config to upgrade
+dependencies automatically at startup (opt-in — it needs the network and is
+slower).
 
 ### 🚀 Installation
 
@@ -135,6 +164,8 @@ Resolved in order: **CLI flags → environment variables → config file → def
 | Output directory | — | `ARGUS_OUTPUT_DIR` | `<script folder>/report` |
 | User-Agent | — | `ARGUS_USER_AGENT` | browser UA |
 | Disable SSL verify | — | `ARGUS_NO_VERIFY_SSL=1` | (verify on) |
+| Startup update hint | — | `ARGUS_NO_UPDATE_CHECK=1` | (check on) |
+| Auto-upgrade on launch | — | `ARGUS_AUTO_UPDATE=1` | (off) |
 
 ```bash
 argus config --init      # write ~/.config/argus/config.json
@@ -212,13 +243,43 @@ colorate ordinate e potendo salvare un report in JSON / CSV / HTML.
 | `domain` | Dati dominio / WHOIS via **RDAP**: registrar, date di creazione/scadenza, name server, stato, DNSSEC |
 | `dns` | Record A / AAAA / MX / TXT / NS / CNAME / SOA via **DNS-over-HTTPS** |
 | `phone` | Analisi numero: validità, tipo linea, operatore, regione, fusi orari, 4 formati (**offline**) |
-| `username` | Cerca uno username su **50+ siti in parallelo** ed elenca dove esiste |
+| `username` | Cerca uno username su **50+ siti in parallelo** con rilevamento per-sito (status / testo / redirect) e uno stato **blocked** onesto per i siti anti-bot |
 | `email` | OSINT email passivo: sintassi, MX (dominio in grado di ricevere posta), Gravatar |
 | `web` | Ricognizione sito / HTTP: status, redirect, server, **audit degli header di sicurezza**, IP risolto |
 | `mac` | Indirizzo MAC → **produttore** hardware (OUI), flag local/multicast |
 | `myip` | Rileva e geolocalizza il **tuo** IP pubblico |
+| `update` | Aggiorna le dipendenze e la lista siti username (`--check` per una prova a vuoto) |
 
 Ogni risultato è esportabile con `--export json|csv|html`.
+
+#### Rilevamento username affidabile
+
+Il controllo ingenuo "HTTP 200 = il profilo esiste" è sbagliato per la maggior
+parte delle grandi piattaforme, che rispondono `200` per qualsiasi URL,
+reindirizzano gli utenti inesistenti o bloccano i bot. Argus usa un modello
+per-sito (`errorType` in `data/sites.json`):
+
+- **`status_code`** — esiste solo su un 2xx *non* reindirizzato altrove.
+- **`message`** — la pagina è sempre 200, quindi decide una stringa nel corpo.
+- **`response_url`** — un profilo assente si riconosce dalla destinazione del redirect.
+
+Le risposte anti-bot / rate-limit (401/403/406/429/451) sono segnalate come
+**`blocked`** — un "sconosciuto" esplicito — invece di essere contate come
+trovate o assenti: così un risultato non pretende mai più certezza di quella che ha.
+
+#### Restare aggiornati
+
+```bash
+argus update            # aggiorna dipendenze + ricarica la lista siti
+argus update --check    # segnala cosa è obsoleto, senza modificare nulla
+argus update --sites    # ricarica solo il catalogo username
+```
+
+All'avvio, il menu interattivo mostra un avviso **non bloccante** di una riga
+quando esiste una versione più recente di una dipendenza (in cache una volta al
+giorno, disattivabile con `ARGUS_NO_UPDATE_CHECK=1`). Imposta `auto_update: true`
+nel config per aggiornare le dipendenze automaticamente all'avvio (opt-in —
+richiede la rete ed è più lento).
 
 ### 🚀 Installazione
 
@@ -281,6 +342,8 @@ Risolta in quest'ordine: **flag CLI → variabili d'ambiente → file di config 
 | Cartella di output | — | `ARGUS_OUTPUT_DIR` | `<cartella script>/report` |
 | User-Agent | — | `ARGUS_USER_AGENT` | UA browser |
 | Disattiva verifica SSL | — | `ARGUS_NO_VERIFY_SSL=1` | (verifica attiva) |
+| Avviso aggiornamenti all'avvio | — | `ARGUS_NO_UPDATE_CHECK=1` | (attivo) |
+| Auto-aggiornamento all'avvio | — | `ARGUS_AUTO_UPDATE=1` | (disattivo) |
 
 ```bash
 argus config --init      # crea ~/.config/argus/config.json
